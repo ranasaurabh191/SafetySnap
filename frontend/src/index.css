@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 antialiased transition-colors duration-200;
+  }
+  
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-neutral-950;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-neutral-800 rounded-full hover:bg-gray-400 dark:hover:bg-neutral-700;
+  }
+}
+
+@layer components {
+  input, textarea, select {
+    @apply bg-white dark:bg-neutral-900 border-gray-300 dark:border-neutral-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-neutral-500;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    @apply ring-orange-500 dark:ring-orange-400 border-orange-500 dark:border-orange-400;
+  }
+  
+  input:disabled, textarea:disabled, select:disabled {
+    @apply bg-gray-100 dark:bg-neutral-950 cursor-not-allowed opacity-60;
+  }
+}

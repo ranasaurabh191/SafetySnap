@@ -1,0 +1,144 @@
+# Logs
+venv
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+datasets
+PPEs-7
+# ---------------------------------------------
+# PYTHON BASICS
+# ---------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+pip-wheel-metadata/
+*.manifest
+*.spec
+
+# ---------------------------------------------
+# VIRTUAL ENVIRONMENTS
+# ---------------------------------------------
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ---------------------------------------------
+# DJANGO FILES
+# ---------------------------------------------
+*.log
+*.pot
+*.pyc
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+*.mo
+
+# Local settings (never commit sensitive info)
+local_settings.py
+.env
+.env.local
+*.env
+
+# Django cache
+*.cache/
+__debug__/
+
+# ---------------------------------------------
+# YOLO / MACHINE LEARNING MODEL FILES
+# ---------------------------------------------
+# Model weights (large binaries)
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.engine
+*.weights
+*.cfg
+
+# Training logs and outputs
+runs/
+results/
+checkpoints/
+yolov*/  # ignore YOLO folders if downloaded or cloned
+data/*.cache
+
+# Temporary datasets or images
+datasets/
+data/images/
+data/labels/
+temp/
+tmp/
+output/
+inference/
+
+# ---------------------------------------------
+# JUPYTER NOTEBOOKS (optional)
+# ---------------------------------------------
+.ipynb_checkpoints/
+*.ipynb
+
+# ---------------------------------------------
+# IDE / EDITOR FILES
+# ---------------------------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ---------------------------------------------
+# SYSTEM / OS FILES
+# ---------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------------------------------------------
+# DOCKER (if using Docker)
+# ---------------------------------------------
+*.pid
+*.pid.lock
+*.tar
+*.log
+docker-compose.override.yml
+
+# ---------------------------------------------
+# TEST / COVERAGE FILES
+# ---------------------------------------------
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.cache/
