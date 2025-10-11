@@ -1,3 +1,27 @@
+export interface PersonDetection {
+  id: number;
+  person_id: string;
+  compliance_status: 'compliant' | 'partial' | 'non_compliant';
+  missing_ppe: string[];
+  detected_ppe: string[];
+  confidence: number;
+}
+
+export interface Detection {
+  id: number;
+  original_image: string;
+  annotated_image: string;
+  detection_count: number;
+  compliant_persons: number;
+  non_compliant_persons: number;
+  partial_compliant_persons: number;
+  num_violations: number;
+  total_violations: number;
+  compliance_rate: number;
+  created_at: string;
+  person_detections?: PersonDetection[];  // Add this
+} 
+
 export interface User {
   id: number;
   username: string;

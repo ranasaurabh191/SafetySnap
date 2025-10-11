@@ -11,7 +11,7 @@ detector = get_detector()
 print("YOLO detector loaded successfully!")
 
 # Test with an image
-test_image = "path/to/your/test/image.jpg"  # Replace with actual path
+test_image = r"D:\PROJECTS\SafetySnap\backend\media\uploads\2025\10\06\bbi-women-1200x800.jpg"  
 if os.path.exists(test_image):
     results = detector.detect(test_image)
     print(f"\nDetection Results:")

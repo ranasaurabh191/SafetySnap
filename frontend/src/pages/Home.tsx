@@ -317,7 +317,7 @@ export const Home = () => {
           className="shadow-lg shadow-orange-500/20"
         >
           <Users className="h-5 w-5 mr-2" />
-          Create Free Account
+          Create Account
         </Button>
         <Button
           onClick={() => navigate('/login')}

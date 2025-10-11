@@ -30,7 +30,7 @@ def main():
     metrics = model.val()
 
     print(f"\nTraining completed!")
-    print(f"Best model saved at: models/ppe_yolo11/weights/best.pt")
+    print(f"Best model saved at: ./backend/ppe.pt")
     print(f"mAP50-95: {metrics.box.map}")
     print(f"mAP50: {metrics.box.map50}")
 

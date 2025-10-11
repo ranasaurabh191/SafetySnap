@@ -12,7 +12,7 @@ const authAPI = axios.create({
 export const logout = async (): Promise<void> => {
   try {
     // Try to call backend logout (will fail gracefully if endpoint doesn't exist)
-    await api.post('/api/auth/logout/');
+    await axios.post('/api/auth/logout/');
   } catch (error) {
     // Ignore 404 errors - we'll clear the token locally anyway
     console.log('Backend logout unavailable, clearing token locally');

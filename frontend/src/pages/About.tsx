@@ -1,12 +1,10 @@
 import { Shield, Users, Zap, Lock, BarChart, Bell } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { PageTransition } from '@/components/common/PageTransition';
 
 export const About = () => {
-  const navigate = useNavigate();
+  
 
   const features = [
     {
@@ -82,7 +80,7 @@ export const About = () => {
               scale: [1, 1.2, 1],
               rotate: [0, 90, 0],
             }}
-            transition={{ duration: 20, repeat: Infinity }}
+            transition={{ duration: 2, repeat: Infinity }}
             className="absolute top-0 right-0 w-96 h-96 bg-orange-200 dark:bg-orange-900 rounded-full opacity-20 blur-3xl"
           />
           <motion.div
@@ -90,7 +88,7 @@ export const About = () => {
               scale: [1.2, 1, 1.2],
               rotate: [90, 0, 90],
             }}
-            transition={{ duration: 25, repeat: Infinity }}
+            transition={{ duration: 2, repeat: Infinity }}
             className="absolute bottom-0 left-0 w-96 h-96 bg-orange-300 dark:bg-orange-800 rounded-full opacity-20 blur-3xl"
           />
         </div>
@@ -100,7 +98,7 @@ export const About = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.1 }}
             className="text-center mb-16"
           >
             <motion.div
@@ -174,7 +172,7 @@ export const About = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
+                  transition={{ delay: idx * 0.02 }}
                   whileHover={{ scale: 1.05, rotate: 1 }}
                 >
                   <Card padding="lg" className="h-full border-2 border-transparent hover:border-orange-400 dark:hover:border-orange-600 transition-all">
@@ -215,7 +213,7 @@ export const About = () => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.05 }}
+                    transition={{ delay: idx * 0.01 }}
                     whileHover={{ y: -5 }}
                     className="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 hover:shadow-lg transition-all"
                   >
@@ -235,7 +233,7 @@ export const About = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            
           >
             <Card padding="lg" className="max-w-4xl mx-auto backdrop-blur-sm bg-white/90 dark:bg-gray-800/90">
               <h2 className="text-3xl font-bold text-center mb-10 text-gray-900 dark:text-white">
@@ -245,16 +243,12 @@ export const About = () => {
                 {techStack.map((tech, idx) => (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
+                   
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     className="text-center"
                   >
                     <motion.div
-                      animate={{ y: [0, -10, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, delay: idx * 0.2 }}
+                      
                       className="text-5xl mb-3"
                     >
                       {tech.emoji}

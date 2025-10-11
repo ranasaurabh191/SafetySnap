@@ -3,10 +3,13 @@ import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { PageTransition } from '@/components/common/PageTransition';
 import { Video, Upload, Camera, StopCircle, Play } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Add this import
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 
 export const VideoMonitor = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -18,12 +21,15 @@ export const VideoMonitor = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate(); // Add this hook
+
 
   useEffect(() => {
     return () => {
       stopWebcam();
     };
   }, []);
+
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -39,6 +45,7 @@ export const VideoMonitor = () => {
       setVideoUrl('');
     }
   };
+
 
   const startWebcam = async () => {
     try {
@@ -58,6 +65,7 @@ export const VideoMonitor = () => {
     }
   };
 
+
   const stopWebcam = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -69,8 +77,10 @@ export const VideoMonitor = () => {
     setWebcamActive(false);
   };
 
+
   const captureFrame = async () => {
     if (!videoRef.current || !canvasRef.current) return;
+
 
     const canvas = canvasRef.current;
     const video = videoRef.current;
@@ -81,13 +91,16 @@ export const VideoMonitor = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+
     ctx.drawImage(video, 0, 0);
     
     canvas.toBlob(async (blob) => {
       if (!blob) return;
 
+
       const formData = new FormData();
       formData.append('original_image', blob, 'webcam-capture.jpg');
+
 
       try {
         setIsProcessing(true);
@@ -104,8 +117,9 @@ export const VideoMonitor = () => {
           }
         );
 
-        toast.success('Frame processed successfully!');
-        console.log('Detection result:', response.data);
+
+        toast.success('Detection completed!'); // Updated message
+        navigate(`/detections/${response.data.id}`); // Add navigation
       } catch (error: any) {
         console.error('Processing failed:', error);
         toast.error(error.response?.data?.error || 'Processing failed');
@@ -115,18 +129,20 @@ export const VideoMonitor = () => {
     }, 'image/jpeg', 0.95);
   };
 
+
   const processVideo = async () => {
     if (!selectedFile) {
       toast.error('Please select a video file');
       return;
     }
 
-    toast.info('Video processing is not yet implemented. Use webcam capture or upload images instead.');
-  };
+
+    toast('Video processing is not yet implemented. Use webcam capture or upload images instead.', {  icon: 'ℹ️',});  };
+
 
   return (
     <PageTransition>
-      <div className="space-y-4 ">
+      <div className="space-y-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Video Monitor</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
@@ -134,12 +150,14 @@ export const VideoMonitor = () => {
           </p>
         </div>
 
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card padding="md">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
               <Camera className="h-5 w-5" />
               Live Webcam
             </h2>
+
 
             <div className="space-y-4">
               <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-video">
@@ -160,7 +178,9 @@ export const VideoMonitor = () => {
                 )}
               </div>
 
+
               <canvas ref={canvasRef} className="hidden" />
+
 
               <div className="flex gap-2">
                 {!webcamActive ? (
@@ -195,11 +215,13 @@ export const VideoMonitor = () => {
             </div>
           </Card>
 
+
           <Card padding="md">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2  flex items-center gap-2">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
               <Upload className="h-5 w-5" />
               Upload Video
             </h2>
+
 
             <div className="space-y-4">
               <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-video">
@@ -219,6 +241,7 @@ export const VideoMonitor = () => {
                 )}
               </div>
 
+
               <input
                 ref={fileInputRef}
                 type="file"
@@ -226,6 +249,7 @@ export const VideoMonitor = () => {
                 onChange={handleFileSelect}
                 className="hidden"
               />
+
 
               <div className="flex gap-2">
                 <Button
@@ -246,6 +270,7 @@ export const VideoMonitor = () => {
                 </Button>
               </div>
 
+
               {selectedFile && (
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Selected: {selectedFile.name}
@@ -254,6 +279,7 @@ export const VideoMonitor = () => {
             </div>
           </Card>
         </div>
+
 
         <Card padding="lg">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">

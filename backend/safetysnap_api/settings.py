@@ -10,6 +10,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production'
 
 DEBUG = True
 
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.onrender.com',  # Add this
+]
+ 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
 
 # Application definition

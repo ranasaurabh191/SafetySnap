@@ -11,7 +11,7 @@ class YOLOPPEDetector:
     """Optimized PPE Detection with improved accuracy and multi-format support"""
     
     def __init__(self):
-        model_path = os.path.join(settings.BASE_DIR, 'ppe.pt')
+        model_path = os.path.join(settings.BASE_DIR, 'YOLO11n.pt')
         
         if not os.path.exists(model_path):
             alt_paths = [
@@ -181,7 +181,7 @@ class YOLOPPEDetector:
                 
                 if ppe_class in ['Hardhat', 'NO-Hardhat']:
                     score = head_overlap * 2.0 + full_overlap * 0.5
-                    print(f"    🔍 {ppe_class} ({ppe_conf:.2f}) - Head score: {score:.3f}")
+                    print(f"     {ppe_class} ({ppe_conf:.2f}) - Head score: {score:.3f}")
                     
                     if score > 0.05:
                         if ppe_conf > ppe_tracking['helmet']['confidence']:
@@ -192,7 +192,7 @@ class YOLOPPEDetector:
                                 'source': ppe_class,
                                 'ppe_id': ppe_id
                             }
-                            print(f"    🪖 ASSIGNED: {ppe_class} ({ppe_conf:.2f}) - {'✓' if detected else '✗'}")
+                            print(f"     ASSIGNED: {ppe_class} ({ppe_conf:.2f}) - {'✓' if detected else '✗'}")
                 
                 elif ppe_class in ['Safety Vest', 'NO-Safety Vest']:
                     score = body_overlap * 2.0 + full_overlap * 0.5
@@ -205,7 +205,7 @@ class YOLOPPEDetector:
                                 'source': ppe_class,
                                 'ppe_id': ppe_id
                             }
-                            print(f"    🦺 ASSIGNED: {ppe_class} ({ppe_conf:.2f}) - {'✓' if detected else '✗'}")
+                            print(f"     ASSIGNED: {ppe_class} ({ppe_conf:.2f}) - {'✓' if detected else '✗'}")
                 
                 elif ppe_class in ['Mask', 'NO-Mask']:
                     face_score = face_overlap * 3.0
@@ -214,7 +214,7 @@ class YOLOPPEDetector:
                     
                     total_score = max(face_score, head_score, full_score)
                     
-                    print(f"    🔍 {ppe_class} ({ppe_conf:.2f}) - Mask scores: face={face_score:.3f}, head={head_score:.3f}, full={full_score:.3f}, total={total_score:.3f}")
+                    print(f"     {ppe_class} ({ppe_conf:.2f}) - Mask scores: face={face_score:.3f}, head={head_score:.3f}, full={full_score:.3f}, total={total_score:.3f}")
                     
                     if total_score > 0.02:
                         mask_candidates.append({
@@ -235,7 +235,7 @@ class YOLOPPEDetector:
                     'source': best_mask['source'],
                     'ppe_id': best_mask['ppe_id']
                 }
-                print(f"    😷 ASSIGNED BEST: {best_mask['source']} ({best_mask['confidence']:.2f}, score={best_mask['score']:.3f}) - {'✓' if best_mask['detected'] else '✗'}")
+                print(f"     ASSIGNED BEST: {best_mask['source']} ({best_mask['confidence']:.2f}, score={best_mask['score']:.3f}) - {'✓' if best_mask['detected'] else '✗'}")
             
             if ppe_tracking['helmet']['ppe_id']:
                 assigned_ppe.add(ppe_tracking['helmet']['ppe_id'])
@@ -250,9 +250,9 @@ class YOLOPPEDetector:
             
             if not has_mask and ppe_tracking['mask']['source'] == 'NO-Mask' and ppe_tracking['mask']['confidence'] < 0.7:
                 has_mask = True
-                print(f"    💡 INFERENCE: Low NO-Mask confidence ({ppe_tracking['mask']['confidence']:.2f}) - Assuming mask PRESENT")
+                print(f"     INFERENCE: Low NO-Mask confidence ({ppe_tracking['mask']['confidence']:.2f}) - Assuming mask PRESENT")
             
-            print(f"    ✅ FINAL: Helmet={has_helmet}, Vest={has_vest}, Mask={has_mask}")
+            print(f"     FINAL: Helmet={has_helmet}, Vest={has_vest}, Mask={has_mask}")
             
             persons.append({
                 'person_id': idx + 1,
