@@ -79,7 +79,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://safetysnap-8219.firebaseapp.com",
 ]
 CORS_ALLOW_CREDENTIALS = True
-
+CORS_ALLOW_ALL_ORIGINS = False
 # ✅ DATABASE CONFIGURATION - FIXED!
 # Use DATABASE_URL from environment (Render/Supabase) or fallback to local PostgreSQL
 DATABASES = {
