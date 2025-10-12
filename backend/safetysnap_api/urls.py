@@ -22,10 +22,11 @@ from django.views.static import serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/auth/', include('users.urls')),  # ✅ Must have this
-    path('api/ppe/', include('ppe_detection.urls')),  # ✅ Must have this
-    path('api/', include('core.urls')),  # Or wherever your main API is
+    path('api/', api_root, name='api-root'),
+    path('api/auth/', include('users.urls')),
+    path('api/ppe/', include('ppe_detection.urls')),
 ]
+
 # Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
