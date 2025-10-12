@@ -46,14 +46,15 @@ ROOT_URLCONF = 'safetysnap_api.urls'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # ✅ Must be here
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'django.middleware.common.CommonMiddleware',  # ✅ CORS before this
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 TEMPLATES = [
     {
@@ -73,13 +74,13 @@ TEMPLATES = [
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "http://localhost:5173",  # Local dev
     "http://localhost:3000",
-    "https://safetysnap-8219.web.app",  # Add your Firebase URL
-    "https://safetysnap-8219.firebaseapp.com",
+    "https://safetysnap-8219.web.app",          # ✅ Add this
+    "https://safetysnap-8219.firebaseapp.com",  # ✅ Add this
 ]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 # ✅ DATABASE CONFIGURATION - FIXED!
 # Use DATABASE_URL from environment (Render/Supabase) or fallback to local PostgreSQL
 DATABASES = {
