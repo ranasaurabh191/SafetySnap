@@ -73,14 +73,38 @@ TEMPLATES = [
 ]
 
 # CORS settings
+# CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Local dev
+    "http://localhost:5173",
     "http://localhost:3000",
-    "https://safetysnap-8219.web.app",          # ✅ Add this
-    "https://safetysnap-8219.firebaseapp.com",  # ✅ Add this
+    "https://safetysnap-8219.web.app",
+    "https://safetysnap-8219.firebaseapp.com",
 ]
+
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True
+
+# Optional: Add explicit headers and methods
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
 # ✅ DATABASE CONFIGURATION - FIXED!
 # Use DATABASE_URL from environment (Render/Supabase) or fallback to local PostgreSQL
 DATABASES = {
