@@ -173,12 +173,30 @@ class DetectionSerializer(serializers.ModelSerializer):
 class DetectionCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating a Detection"""
     
+    site = serializers.PrimaryKeyRelatedField(
+        queryset=Site.objects.all(),
+        required=False,
+        allow_null=True
+    )
+    policy = serializers.PrimaryKeyRelatedField(
+        queryset=PPEPolicy.objects.all(),
+        required=False,
+        allow_null=True
+    )
+    location_lat = serializers.FloatField(required=False, allow_null=True)
+    location_lng = serializers.FloatField(required=False, allow_null=True)
+    notes = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    
     class Meta:
         model = Detection
         fields = ['original_image', 'site', 'policy', 'location_lat', 'location_lng', 'notes']
-    
-    
-
+        extra_kwargs = {
+            'site': {'required': False, 'allow_null': True},
+            'policy': {'required': False, 'allow_null': True},
+            'location_lat': {'required': False, 'allow_null': True},
+            'location_lng': {'required': False, 'allow_null': True},
+            'notes': {'required': False, 'allow_blank': True, 'allow_null': True},
+        }
 
 class DetectionListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for detection list view"""
