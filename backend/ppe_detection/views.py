@@ -20,7 +20,26 @@ from .huggingface_service import get_detector
 
 from users.models import Site
 
-
+@transaction.atomic
+def create(self, request, *args, **kwargs):
+    """Create a new detection"""
+    # ✅ ADD THIS DEBUG BLOCK
+    print(f"\n{'='*70}")
+    print(f"[DEBUG] NEW DETECTION REQUEST")
+    print(f"{'='*70}")
+    print(f"[DEBUG] User: {request.user}")
+    print(f"[DEBUG] Content-Type: {request.content_type}")
+    print(f"[DEBUG] Request data keys: {list(request.data.keys())}")
+    print(f"[DEBUG] Request FILES: {list(request.FILES.keys())}")
+    print(f"[DEBUG] Auth: {request.auth}")
+    print(f"{'='*70}\n")
+    
+    serializer = self.get_serializer(data=request.data)
+    
+    # ✅ CHECK VALIDATION
+    if not serializer.is_valid():
+        print(f"❌ [VALIDATION ERROR]: {serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class PPEPolicyViewSet(viewsets.ModelViewSet):
     """ViewSet for PPE Policy operations"""
     serializer_class = PPEPolicySerializer
