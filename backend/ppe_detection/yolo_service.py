@@ -306,10 +306,7 @@ class YOLOPPEDetector:
                 'helmet': {'detected': has_helmet, 'confidence': 0.85 if has_helmet else 0.0},
                 'safety_vest': {'detected': has_vest, 'confidence': 0.85 if has_vest else 0.0},
                 'safety_boots': {'detected': True, 'confidence': 0.70},
-                'gloves': {'detected': False, 'confidence': 0.0},
-                'safety_glasses': {'detected': False, 'confidence': 0.0},
-                'face_mask': {'detected': has_mask, 'confidence': 0.80 if has_mask else 0.0},
-                'harness': {'detected': False, 'confidence': 0.0}
+
             }
         }]
     
