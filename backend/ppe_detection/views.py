@@ -16,7 +16,8 @@ from .serializers import (
     PersonDetectionSerializer, ViolationSerializer, PPEPolicySerializer,
     NotificationSerializer
 )
-from .yolo_service import get_detector
+from .huggingface_service import get_detector  # ✅ Use this
+
 
 
 
