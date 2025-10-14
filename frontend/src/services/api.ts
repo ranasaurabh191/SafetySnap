@@ -67,6 +67,7 @@ const api = axios.create({
   },
   withCredentials: true,
 });
+
 // Add these interfaces at the top with other types
 export interface Notification {
   id: string;
