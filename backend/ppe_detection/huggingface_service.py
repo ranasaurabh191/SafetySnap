@@ -4,91 +4,144 @@ import json
 import requests
 from django.conf import settings
 import numpy as np
+import base64
 
 
 class HuggingFacePPEDetector:
-    """PPE Detector using Gradio API"""
+    """PPE Detector using HuggingFace Gradio Space"""
     
     def __init__(self):
         self.space_name = os.environ.get(
             'HUGGINGFACE_SPACE', 
             'srb82191/safetysnap-ppe-detector'
         )
-        # Use Gradio's /run/predict endpoint
-        self.api_url = f"https://{self.space_name.replace('/', '-')}.hf.space/run/predict"
-        print(f"[HUGGINGFACE] API URL: {self.api_url}")
+        self.base_url = f"https://{self.space_name.replace('/', '-')}.hf.space"
+        print(f"[HUGGINGFACE] Space: {self.space_name}")
+        print(f"[HUGGINGFACE] URL: {self.base_url}")
     
     def detect(self, image_path: str):
-        """Detect PPE"""
+        """Detect PPE using Gradio API"""
         start_time = time.time()
         
         print(f"[HUGGINGFACE] Processing: {os.path.basename(image_path)}")
         
         try:
-            # Read image as base64
-            import base64
+            # Read and encode image
             with open(image_path, 'rb') as f:
-                image_base64 = base64.b64encode(f.read()).decode('utf-8')
+                image_bytes = f.read()
+                image_base64 = base64.b64encode(image_bytes).decode('utf-8')
             
-            # Gradio expects data in this format
-            payload = {
-                "data": [
-                    f"data:image/jpeg;base64,{image_base64}"
-                ]
-            }
+            # Try direct API call first
+            api_url = f"{self.base_url}/api/predict"
             
-            print(f"[HUGGINGFACE] Sending request...")
+            print(f"[HUGGINGFACE] Trying direct API: {api_url}")
+            
+            try:
+                response = requests.post(
+                    api_url,
+                    json={"data": [f"data:image/jpeg;base64,{image_base64}"]},
+                    timeout=120
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if 'data' in data and len(data['data']) >= 2:
+                        json_str = data['data'][1]
+                        results = json.loads(json_str) if isinstance(json_str, str) else json_str
+                        
+                        return self._format_results(results, time.time() - start_time)
+            
+            except Exception as direct_error:
+                print(f"[HUGGINGFACE] Direct API failed: {direct_error}")
+            
+            # Fallback: Try Gradio API with polling
+            print(f"[HUGGINGFACE] Trying Gradio API with polling...")
+            
+            submit_url = f"{self.base_url}/gradio_api/call/predict"
             
             response = requests.post(
-                self.api_url,
-                json=payload,
-                timeout=120
+                submit_url,
+                json={"data": [f"data:image/jpeg;base64,{image_base64}"]},
+                timeout=30
             )
             
-            print(f"[HUGGINGFACE] Response: {response.status_code}")
-            
             if response.status_code != 200:
-                raise Exception(f"API returned {response.status_code}: {response.text}")
+                raise Exception(f"Submit failed: {response.status_code} - {response.text}")
             
-            data = response.json()
+            result = response.json()
+            event_id = result.get('event_id')
             
-            # Gradio returns: {"data": [annotated_image_data, json_string]}
-            if 'data' in data and len(data['data']) >= 2:
-                json_str = data['data'][1]
-                results = json.loads(json_str) if isinstance(json_str, str) else json_str
+            if not event_id:
+                raise Exception(f"No event_id: {result}")
+            
+            print(f"[HUGGINGFACE] Event ID: {event_id}")
+            
+            # Poll for results
+            status_url = f"{self.base_url}/gradio_api/call/predict/{event_id}"
+            
+            max_wait = 120
+            elapsed = 0
+            
+            while elapsed < max_wait:
+                try:
+                    response = requests.get(status_url, stream=True, timeout=10)
+                    
+                    for line in response.iter_lines():
+                        if line:
+                            line_str = line.decode('utf-8')
+                            if line_str.startswith('data: '):
+                                data_str = line_str[6:]
+                                try:
+                                    data = json.loads(data_str)
+                                    
+                                    if isinstance(data, list) and len(data) >= 2:
+                                        json_str = data[1]
+                                        results = json.loads(json_str) if isinstance(json_str, str) else json_str
+                                        
+                                        return self._format_results(results, time.time() - start_time)
+                                
+                                except json.JSONDecodeError:
+                                    continue
                 
-                persons = results.get('persons', [])
+                except Exception as poll_error:
+                    print(f"[HUGGINGFACE] Poll error: {poll_error}")
                 
-                print(f"[HUGGINGFACE] Found {len(persons)} persons")
-                
-                processing_time = time.time() - start_time
-                
-                # Calculate average confidence
-                all_confidences = []
-                for person in persons:
-                    all_confidences.append(person.get('confidence', 0))
-                    ppe = person.get('ppe', {})
-                    for item in ppe.values():
-                        if isinstance(item, dict) and 'confidence' in item:
-                            all_confidences.append(item['confidence'])
-                
-                avg_confidence = np.mean(all_confidences) if all_confidences else 0
-                
-                return {
-                    'num_persons': len(persons),
-                    'persons': persons,
-                    'avg_confidence': round(avg_confidence, 2),
-                    'processing_time': round(processing_time, 2),
-                    'annotated_image_path': None,
-                }
-            else:
-                raise Exception(f"Unexpected response format: {data}")
+                time.sleep(2)
+                elapsed += 2
+            
+            raise Exception("Timeout waiting for results")
             
         except Exception as e:
             print(f"[HUGGINGFACE] Error: {e}")
             import traceback
             traceback.print_exc()
             raise
+    
+    def _format_results(self, results, processing_time):
+        """Format detection results"""
+        persons = results.get('persons', [])
+        
+        print(f"[HUGGINGFACE] Found {len(persons)} persons")
+        
+        # Calculate average confidence
+        all_confidences = []
+        for person in persons:
+            all_confidences.append(person.get('confidence', 0))
+            ppe = person.get('ppe', {})
+            for item in ppe.values():
+                if isinstance(item, dict) and 'confidence' in item:
+                    all_confidences.append(item['confidence'])
+        
+        avg_confidence = np.mean(all_confidences) if all_confidences else 0
+        
+        return {
+            'num_persons': len(persons),
+            'persons': persons,
+            'avg_confidence': round(avg_confidence, 2),
+            'processing_time': round(processing_time, 2),
+            'annotated_image_path': None,
+        }
 
 
 def get_detector():

@@ -16,8 +16,7 @@ from .serializers import (
     PersonDetectionSerializer, ViolationSerializer, PPEPolicySerializer,
     NotificationSerializer
 )
-from .huggingface_service import get_detector  # ✅ Use this
-
+from .huggingface_service import get_detector
 
 
 from rest_framework.decorators import api_view, permission_classes
