@@ -20,6 +20,21 @@ from .huggingface_service import get_detector  # ✅ Use this
 
 
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from django.db import connection
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def test_db(request):
+    """Test database connection"""
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+        return Response({'status': 'Database connected!'})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
 
 from users.models import Site
 

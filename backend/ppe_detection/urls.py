@@ -11,7 +11,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('notifications/', views.get_notifications, name='notifications'),
     path('notifications/<str:notification_id>/read/', views.mark_notification_read, name='mark-read'),
-    
+    path('test-db/', views.test_db, name='test-db'),
+
     # NEW: Video processing endpoints
     path('video/upload/', views.process_video, name='video-upload'),
     path('video/webcam/', views.webcam_stream, name='webcam-stream'),
