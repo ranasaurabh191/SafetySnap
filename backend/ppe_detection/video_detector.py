@@ -8,10 +8,10 @@ class VideoPPEMonitor:
     """Video PPE monitoring (GitHub repo style)"""
     
     def __init__(self):
-        model_path = os.path.join(settings.BASE_DIR, 'yolov8s_custom.pt')
+        model_path = os.path.join(settings.BASE_DIR, 'YOLO11n.pt')
         self.model = YOLO(model_path)
         
-        self.safety_classes = ['Glass', 'Gloves', 'Helmet', 'Safety-Vest', 'helmet']
+        self.safety_classes = [ 'Helmet', 'Safety-Vest', 'helmet']
         self.last_check_time = time.time()
         
         # Directory for violation snapshots
