@@ -5,45 +5,67 @@ import os
 from django.conf import settings
 import numpy as np
 from PIL import Image
-
+import torch
 
 class YOLOPPEDetector:
-    """Optimized PPE Detection with improved accuracy and multi-format support"""
+    """Dual-model PPE Detector: Fast model for video, Accurate model for images"""
     
     def __init__(self):
-        model_path = os.path.join(settings.BASE_DIR, 'YOLO11n.pt')
+        # ✅ MODEL 1: Accurate model for image detection
+        image_model_path = os.path.join(settings.BASE_DIR, 'YOLO11n.pt')
         
-        if not os.path.exists(model_path):
+        # ✅ MODEL 2: Fast model for video streaming
+        video_model_path = os.path.join(settings.BASE_DIR, 'best.pt')
+        
+        # Check and load image model
+        if not os.path.exists(image_model_path):
             alt_paths = [
-                os.path.join(settings.BASE_DIR, 'YOLO-Weights', 'ppe.pt'),
+                os.path.join(settings.BASE_DIR, 'YOLO-Weights', 'YOLO11n.pt'),
                 os.path.join(settings.BASE_DIR, 'models', 'ppe_yolo11', 'weights', 'ppe.pt'),
             ]
             
             for alt_path in alt_paths:
                 if os.path.exists(alt_path):
-                    model_path = alt_path
+                    image_model_path = alt_path
                     break
             else:
-                raise FileNotFoundError(f"ppe.pt model not found in {settings.BASE_DIR}")
+                raise FileNotFoundError(f"Image model not found in {settings.BASE_DIR}")
         
-        self.model = YOLO(model_path)
+        # ✅ Load accurate model for images
+        self.image_model = YOLO(image_model_path)
+        self.model = self.image_model  # Default reference
+        
+        # ✅ Load fast model for video (if available)
+        if os.path.exists(video_model_path):
+            self.video_model = YOLO(video_model_path)
+            print(f"[PPE DETECTOR] ✅ Loaded IMAGE model: {os.path.basename(image_model_path)}")
+            print(f"[PPE DETECTOR] ✅ Loaded VIDEO model: {os.path.basename(video_model_path)}")
+        else:
+            # Fallback: use same model for both
+            self.video_model = self.image_model
+            print(f"[PPE DETECTOR] ⚠️ Using single model: {os.path.basename(image_model_path)}")
+            print(f"[PPE DETECTOR] 💡 Tip: Add 'best.pt' for faster video streaming")
+        
         self.classNames = ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 
                           'Person', 'Safety Cone', 'Safety Vest', 'machinery', 'vehicle']
         
-        print(f"[PPE DETECTOR] Loaded: {model_path}")
+        # ✅ GPU acceleration if available
+        if torch.cuda.is_available():
+            self.image_model.to('cuda')
+            self.video_model.to('cuda')
+            print(f"[PPE DETECTOR] 🚀 Using GPU: {torch.cuda.get_device_name(0)}")
+        else:
+            print("[PPE DETECTOR] 💻 Using CPU")
     
     def _load_image(self, image_path: str):
-        """Load image with support for multiple formats (PNG, JPG, BMP, WebP, TIFF, etc.)"""
+        """Load image with support for multiple formats"""
         try:
-            # Try PIL first (supports more formats)
             pil_image = Image.open(image_path)
             
-            # Convert to RGB if needed
             if pil_image.mode != 'RGB':
                 print(f"[IMAGE] Converting {pil_image.mode} to RGB")
                 pil_image = pil_image.convert('RGB')
             
-            # Convert PIL to OpenCV format (BGR)
             img = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
             
             print(f"[IMAGE] Loaded: {image_path} ({pil_image.format}, {pil_image.mode})")
@@ -51,28 +73,85 @@ class YOLOPPEDetector:
             
         except Exception as e:
             print(f"[ERROR] PIL failed, trying cv2: {e}")
-            # Fallback to cv2
             img = cv2.imread(image_path)
             if img is None:
                 raise ValueError(f"Could not read image: {image_path}")
             return img
     
+    # ✅ NEW: Fast detection for video frames
+    def detect_frame(self, frame, use_fast_model=True):
+        """
+        Process a single frame for real-time video
+        
+        Args:
+            frame: numpy array (BGR image)
+            use_fast_model: If True, use faster video model
+        
+        Returns:
+            dict with persons, num_persons, and YOLO results
+        """
+        # Select model based on use case
+        model = self.video_model if use_fast_model else self.image_model
+        
+        # Fast inference with optimized settings
+        results = model(frame, verbose=False, conf=0.5, iou=0.5)[0]
+        
+        persons = []
+        for box in results.boxes:
+            cls_id = int(box.cls[0])
+            class_name = self.classNames[cls_id] if cls_id < len(self.classNames) else "Unknown"
+            confidence = float(box.conf[0])
+            
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
+            
+            person_data = {
+                'bbox': [x1, y1, x2, y2],
+                'confidence': confidence,
+                'ppe': self._extract_ppe_from_class(class_name, confidence)
+            }
+            persons.append(person_data)
+        
+        return {
+            'persons': persons,
+            'num_persons': len(persons),
+            'results': results  # ✅ Return for plotting
+        }
+
+    def _extract_ppe_from_class(self, class_name, confidence):
+        """Extract PPE status from class name"""
+        ppe = {
+            'helmet': {'detected': False, 'confidence': 0},
+            'safety_vest': {'detected': False, 'confidence': 0},
+            'face_mask': {'detected': False, 'confidence': 0},
+        }
+        
+        class_lower = class_name.lower()
+        if 'helmet' in class_lower or 'hardhat' in class_lower:
+            ppe['helmet'] = {'detected': 'no' not in class_lower, 'confidence': confidence}
+        if 'vest' in class_lower or 'jacket' in class_lower:
+            ppe['safety_vest'] = {'detected': 'no' not in class_lower, 'confidence': confidence}
+        if 'mask' in class_lower:
+            ppe['face_mask'] = {'detected': 'no' not in class_lower, 'confidence': confidence}
+        
+        return ppe
+
+    # ✅ EXISTING: Accurate detection for images
     def detect(self, image_path: str):
-        """Detect PPE with optimized accuracy"""
+        """Detect PPE with accurate model (for image uploads)"""
         import time
         start_time = time.time()
         
         print(f"\n{'='*70}")
-        print(f"PROCESSING: {os.path.basename(image_path)}")
+        print(f"PROCESSING IMAGE: {os.path.basename(image_path)}")
         print(f"{'='*70}")
         
-        # Use the new image loader
         img = self._load_image(image_path)
         
         height, width = img.shape[:2]
         print(f"Image: {width}x{height}px")
         
-        results = self.model(img, stream=True, conf=0.4, iou=0.5)
+        # ✅ Use ACCURATE image model
+        results = self.image_model(img, stream=True, conf=0.4, iou=0.5)
         
         all_detections = []
         
@@ -84,7 +163,7 @@ class YOLOPPEDetector:
                 
                 conf = math.ceil((box.conf[0] * 100)) / 100
                 cls = int(box.cls[0])
-                class_name = self.classNames[cls]
+                class_name = self.classNames[cls] if cls < len(self.classNames) else "Unknown"
                 
                 print(f"  - {class_name}: {conf:.0%}")
                 
@@ -116,7 +195,7 @@ class YOLOPPEDetector:
                           for p in persons) if persons else False
         
         processing_time = time.time() - start_time
-        print(f"[TIME] {processing_time:.2f}s\n")
+        print(f"[TIME] {processing_time:.2f}s (Accurate Model)\n")
         
         return {
             'num_persons': len(persons),
@@ -128,7 +207,7 @@ class YOLOPPEDetector:
         }
     
     def _build_person_data_optimized(self, all_detections, width, height):
-        """OPTIMIZED: Better person-PPE association with enhanced MASK detection"""
+        """Optimized person-PPE association with enhanced mask detection"""
         if not all_detections:
             return []
         
@@ -145,7 +224,6 @@ class YOLOPPEDetector:
             px1, py1, px2, py2 = person_det['bbox']
             person_conf = person_det['confidence']
             person_height = py2 - py1
-            person_width = px2 - px1
             
             print(f"\n  👤 Person #{idx+1} at ({px1:.0f}, {py1:.0f}, {px2:.0f}, {py2:.0f})")
             
@@ -181,40 +259,32 @@ class YOLOPPEDetector:
                 
                 if ppe_class in ['Hardhat', 'NO-Hardhat']:
                     score = head_overlap * 2.0 + full_overlap * 0.5
-                    print(f"     {ppe_class} ({ppe_conf:.2f}) - Head score: {score:.3f}")
                     
-                    if score > 0.05:
-                        if ppe_conf > ppe_tracking['helmet']['confidence']:
-                            detected = (ppe_class == 'Hardhat')
-                            ppe_tracking['helmet'] = {
-                                'detected': detected,
-                                'confidence': ppe_conf,
-                                'source': ppe_class,
-                                'ppe_id': ppe_id
-                            }
-                            print(f"     ASSIGNED: {ppe_class} ({ppe_conf:.2f}) - {'✓' if detected else '✗'}")
+                    if score > 0.05 and ppe_conf > ppe_tracking['helmet']['confidence']:
+                        detected = (ppe_class == 'Hardhat')
+                        ppe_tracking['helmet'] = {
+                            'detected': detected,
+                            'confidence': ppe_conf,
+                            'source': ppe_class,
+                            'ppe_id': ppe_id
+                        }
                 
                 elif ppe_class in ['Safety Vest', 'NO-Safety Vest']:
                     score = body_overlap * 2.0 + full_overlap * 0.5
-                    if score > 0.05:
-                        if ppe_conf > ppe_tracking['vest']['confidence']:
-                            detected = (ppe_class == 'Safety Vest')
-                            ppe_tracking['vest'] = {
-                                'detected': detected,
-                                'confidence': ppe_conf,
-                                'source': ppe_class,
-                                'ppe_id': ppe_id
-                            }
-                            print(f"     ASSIGNED: {ppe_class} ({ppe_conf:.2f}) - {'✓' if detected else '✗'}")
+                    if score > 0.05 and ppe_conf > ppe_tracking['vest']['confidence']:
+                        detected = (ppe_class == 'Safety Vest')
+                        ppe_tracking['vest'] = {
+                            'detected': detected,
+                            'confidence': ppe_conf,
+                            'source': ppe_class,
+                            'ppe_id': ppe_id
+                        }
                 
                 elif ppe_class in ['Mask', 'NO-Mask']:
                     face_score = face_overlap * 3.0
                     head_score = head_overlap * 2.0
                     full_score = full_overlap * 0.8
-                    
                     total_score = max(face_score, head_score, full_score)
-                    
-                    print(f"     {ppe_class} ({ppe_conf:.2f}) - Mask scores: face={face_score:.3f}, head={head_score:.3f}, full={full_score:.3f}, total={total_score:.3f}")
                     
                     if total_score > 0.02:
                         mask_candidates.append({
@@ -228,29 +298,25 @@ class YOLOPPEDetector:
             if mask_candidates:
                 mask_candidates.sort(key=lambda x: (x['score'], x['confidence']), reverse=True)
                 best_mask = mask_candidates[0]
-                
                 ppe_tracking['mask'] = {
                     'detected': best_mask['detected'],
                     'confidence': best_mask['confidence'],
                     'source': best_mask['source'],
                     'ppe_id': best_mask['ppe_id']
                 }
-                print(f"     ASSIGNED BEST: {best_mask['source']} ({best_mask['confidence']:.2f}, score={best_mask['score']:.3f}) - {'✓' if best_mask['detected'] else '✗'}")
             
-            if ppe_tracking['helmet']['ppe_id']:
-                assigned_ppe.add(ppe_tracking['helmet']['ppe_id'])
-            if ppe_tracking['vest']['ppe_id']:
-                assigned_ppe.add(ppe_tracking['vest']['ppe_id'])
-            if ppe_tracking['mask']['ppe_id']:
-                assigned_ppe.add(ppe_tracking['mask']['ppe_id'])
+            # Mark assigned PPE
+            for key in ['helmet', 'vest', 'mask']:
+                if ppe_tracking[key]['ppe_id']:
+                    assigned_ppe.add(ppe_tracking[key]['ppe_id'])
             
             has_helmet = ppe_tracking['helmet']['detected']
             has_vest = ppe_tracking['vest']['detected']
             has_mask = ppe_tracking['mask']['detected']
             
+            # Low confidence NO-Mask inference
             if not has_mask and ppe_tracking['mask']['source'] == 'NO-Mask' and ppe_tracking['mask']['confidence'] < 0.7:
                 has_mask = True
-                print(f"     INFERENCE: Low NO-Mask confidence ({ppe_tracking['mask']['confidence']:.2f}) - Assuming mask PRESENT")
             
             print(f"     FINAL: Helmet={has_helmet}, Vest={has_vest}, Mask={has_mask}")
             
@@ -292,7 +358,7 @@ class YOLOPPEDetector:
             all_y.extend([d['bbox'][1], d['bbox'][3]])
         
         person_bbox = [float(min(all_x)), float(min(all_y)), 
-                    float(max(all_x)), float(max(all_y))]
+                      float(max(all_x)), float(max(all_y))]
         
         has_helmet = any(p['class'] == 'Hardhat' for p in ppe_items) and not any(p['class'] == 'NO-Hardhat' for p in ppe_items)
         has_vest = any(p['class'] == 'Safety Vest' for p in ppe_items) and not any(p['class'] == 'NO-Safety Vest' for p in ppe_items)
@@ -306,12 +372,15 @@ class YOLOPPEDetector:
                 'helmet': {'detected': has_helmet, 'confidence': 0.85 if has_helmet else 0.0},
                 'safety_vest': {'detected': has_vest, 'confidence': 0.85 if has_vest else 0.0},
                 'safety_boots': {'detected': True, 'confidence': 0.70},
-
+                'gloves': {'detected': False, 'confidence': 0.0},
+                'safety_glasses': {'detected': False, 'confidence': 0.0},
+                'face_mask': {'detected': has_mask, 'confidence': 0.85 if has_mask else 0.0},
+                'harness': {'detected': False, 'confidence': 0.0}
             }
         }]
     
     def _calculate_overlap_score(self, box1, box2):
-        """Calculate IoU (Intersection over Union) as overlap score"""
+        """Calculate IoU (Intersection over Union)"""
         x1_min, y1_min, x1_max, y1_max = box1
         x2_min, y2_min, x2_max, y2_max = box2
         
@@ -364,4 +433,5 @@ class YOLOPPEDetector:
 
 
 def get_detector():
+    """Get singleton detector instance"""
     return YOLOPPEDetector()

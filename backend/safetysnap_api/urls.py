@@ -42,6 +42,7 @@ urlpatterns = [
     path('api/', api_root, name='api-root'),
     path('api/auth/', include('users.urls')),
     path('api/ppe/', include('ppe_detection.urls')),
+    
 ]
 
 # Serve media files in development

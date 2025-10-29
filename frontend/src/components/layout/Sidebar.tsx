@@ -1,14 +1,17 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Upload, FileText, Settings, Info, Video, X } from 'lucide-react';
+import { LayoutDashboard, Upload, FileText, Settings, Info, Video, X, BarChart3 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/video-monitor', label: 'Video Monitor', icon: Video },
-  { path: '/upload', label: 'Upload', icon: Upload },
+  { path: '/cctv-monitor', label: 'CCTV Monitor', icon: Video },
+  { path: '/video-monitor', label: 'Live Video Monitor', icon: Video },
+  { path: '/upload', label: 'Upload Image', icon: Upload },
   { path: '/detections', label: 'Detections', icon: FileText },
+  { path: '/violation-stats', label: 'Violation Statistics', icon: BarChart3 },
+   // ✅ NEW
   { path: '/settings', label: 'Settings', icon: Settings },
   { path: '/about', label: 'About', icon: Info },
 ];

@@ -238,7 +238,7 @@ export const Settings = () => {
             </div>
             <div>
               <p className="text-gray-600 dark:text-gray-400">Model</p>
-              <p className="font-medium text-gray-900 dark:text-white">YOLO11n</p>
+              <p className="font-medium text-gray-900 dark:text-white">YOLO11n & YOLOv8n</p>
             </div>
             <div>
               <p className="text-gray-600 dark:text-gray-400">API Status</p>

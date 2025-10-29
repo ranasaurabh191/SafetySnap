@@ -79,7 +79,8 @@ class Detection(models.Model):
         ('partial', 'Partially Compliant'),
         ('non_compliant', 'Non-Compliant'),
     ]
-    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    model_used = models.CharField(max_length=100, default='YOLO11n', blank=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='detections')
     site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True, related_name='detections')

@@ -15,6 +15,8 @@ import { useAppStore } from './store/useAppStore';
 import { Settings } from './pages/Settings';
 import { About } from './pages/About';
 import { Home } from '@/pages/Home';
+import { ViolationStats } from '@/pages/ViolationStats';
+import { CCTVMonitor } from '@/pages/CCTVMonitor';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,7 +52,9 @@ function App() {
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/upload" element={<Upload />} />
+            <Route path="/cctv-monitor" element={<CCTVMonitor />} />
             <Route path="/detections" element={<Detections />} />
+            <Route path="/violation-stats" element={<ViolationStats />} />
             <Route path="/detections/:id" element={<DetectionDetail />} />
             <Route path="/video-monitor" element={<VideoMonitor />} />
             <Route path="/settings" element={<Settings />} />
