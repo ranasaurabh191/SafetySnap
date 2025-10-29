@@ -17,7 +17,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Documentation](#api-documentation)
-- [Screenshots](#screenshots)
+- [Screenshots](#screenshots) <===
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [License](#license)
@@ -292,17 +292,20 @@ curl -X POST http://localhost:8000/api/ppe/detections/ \
 
 ## 📸 Screenshots
 
+### Home
+![Home](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141615.png)
+
 ### Dashboard
-![Dashboard](https://via.placeholder.com/800x450?text=Dashboard+Screenshot)
+![Dashboard](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141652.png)
+
+### CCTV Monitor
+![CCTV Monitor](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141703.png)
 
 ### Live Detection
-![Live Monitor](https://via.placeholder.com/800x450?text=Live+Detection+Screenshot)
+![Live Detection](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141809.png)
 
 ### Detection History
-![History](https://via.placeholder.com/800x450?text=Detection+History+Screenshot)
-
-### Analytics
-![Analytics](https://via.placeholder.com/800x450?text=Analytics+Dashboard)
+![Detection History](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141836.png)
 
 ---
 
