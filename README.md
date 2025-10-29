@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
 
-> **Real-time Personal Protective Equipment (PPE) detection system using YOLOv11 for workplace safety compliance monitoring.**
+> **Real-time Personal Protective Equipment (PPE) detection system using YOLOv11 and YOLOv8 for workplace safety compliance monitoring.**
 
 ---
 
@@ -369,9 +369,9 @@ Contributions are welcome! Please follow these steps:
 **[Saurabh Rana]** - B.Tech Computer Science Engineering Student  
 
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
+- GitHub: [@ranasaurabh191](https://github.com/ranasaurabh191))
+- LinkedIn: [Saurabh Rana](https://www.linkedin.com/in/-rana-saurabh)
+- Email: ranasaurabh191@gmail.com
 
 ---
 
