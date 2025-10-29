@@ -18,9 +18,7 @@
 - [Usage](#usage)
 - [API Documentation](#api-documentation)
 - [Screenshots](#screenshots) <===
-- [Deployment](#deployment)
 - [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
 
 ---
