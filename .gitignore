@@ -79,6 +79,13 @@ __debug__/
 # YOLO / MACHINE LEARNING MODEL FILES
 # ---------------------------------------------
 # Model weights (large binaries)
+backend/*.pt
+backend/*.pth
+backend/*.onnx
+backend/*.tflite
+backend/*.engine
+backend/*.weights
+backend/*.cfg
 *.pt
 *.pth
 *.onnx
