@@ -12,11 +12,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production'
 # IMPORTANT: Set DEBUG based on environment
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.onrender.com',
-]
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
