@@ -34,6 +34,43 @@ import cv2
 import threading
 import time
 from queue import Queue
+from django.http import JsonResponse
+from django.conf import settings
+from django.db import connection
+import os
+
+def health_check(request):
+    """Health check endpoint for Nagios monitoring"""
+    try:
+        # Check database connectivity
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        
+        # Check YOLO model exists
+        model_path = os.path.join(settings.BASE_DIR, 'YOLO11n.pt')
+        model_exists = os.path.exists(model_path)
+        
+        # Check media directory is writable
+        media_writable = os.access(settings.MEDIA_ROOT, os.W_OK)
+        
+        health_status = {
+            'status': 'healthy',
+            'database': 'connected',
+            'model_loaded': model_exists,
+            'media_writable': media_writable,
+            'version': '1.0.0'
+        }
+        
+        if not model_exists or not media_writable:
+            return JsonResponse(health_status, status=503)
+        
+        return JsonResponse(health_status, status=200)
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'unhealthy',
+            'error': str(e)
+        }, status=503)
 
 # ✅ RTSP Camera Manager with Threading
 class RTSPCameraManager:

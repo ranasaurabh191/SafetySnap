@@ -23,6 +23,7 @@ from rest_framework.response import Response
 from django.contrib import admin
 from django.urls import path, include, re_path  # Add re_path here  
 from django.views.static import serve  # Add this import
+from ppe_detection.views import health_check
 
 
 @api_view(['GET'])
@@ -42,6 +43,7 @@ urlpatterns = [
     path('api/', api_root, name='api-root'),
     path('api/auth/', include('users.urls')),
     path('api/ppe/', include('ppe_detection.urls')),
+    path('api/health/', health_check, name='health_check'),
     
 ]
 
