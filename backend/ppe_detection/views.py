@@ -58,7 +58,6 @@ def health_check(request):
             'database': 'connected',
             'model_loaded': model_exists,
             'media_writable': media_writable,
-            'version': '1.0.0'
         }
         
         if not model_exists or not media_writable:

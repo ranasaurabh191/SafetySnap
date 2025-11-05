@@ -295,7 +295,7 @@ export const Detections = () => {
                   onClick={() => handleCardClick(detection.id)}
                 >
                   {/* ✅ Responsive Image Container */}
-                  <div className="relative h-48 sm:h-56 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+                  <div className="relative h-30 sm:h-36 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
                     {detection.annotated_image ? (
                       <img
                         src={
@@ -350,10 +350,10 @@ export const Detections = () => {
                   </div>
 
                   {/* ✅ Responsive Card Content */}
-                  <div className="p-5 sm:p-2 space-y-3 sm:space-y-4 bg-white dark:bg-gray-800">
+                  <div className="p-5 sm:p-2 space-y-3 sm:space-y-2 bg-white dark:bg-gray-800">
                     {/* Stats Grid */}
                     <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                      <div className="text-center p-2 sm:p-3 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-lg sm:rounded-xl border border-orange-200 dark:border-orange-800">
+                      <div className="text-center p-3 sm:p-4 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-lg sm:rounded-xl border border-orange-200 dark:border-orange-800">
                         <Users className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-400 mx-auto " />
                         <div className="text-lg sm:text-xl font-bold text-orange-700 dark:text-orange-400">
                           {numPersons}
@@ -379,12 +379,12 @@ export const Detections = () => {
                     </div>
 
                     {/* Info Section */}
-                    <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <div className="space-y-2 pt-2 border-t font-bold border-gray-200 dark:border-gray-700">
                       <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+                        <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 font-bold text-gray-400 flex-shrink-0" />
                         <span className="truncate">{formatDate(detectedDate)}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
                         <span>Processed in {detection.processing_time?.toFixed(2) || '0.00'}s</span>
                       </div>

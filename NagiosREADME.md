@@ -1,6 +1,6 @@
 
 ## To activate the new configuration, you need to run:
-  systemctl restart apache2
+systemctl restart apache2
 Enabling module cgi.
 ## To activate the new configuration, you need to run:
   systemctl restart apache2
@@ -173,7 +173,6 @@ import requests
 import json
 import subprocess
 
-# Nagios exit codes
 STATE_OK = 0
 STATE_WARNING = 1
 STATE_CRITICAL = 2
