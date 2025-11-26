@@ -11,13 +11,11 @@ class YOLOPPEDetector:
     """Dual-model PPE Detector: Fast model for video, Accurate model for images"""
     
     def __init__(self):
-        # ✅ MODEL 1: Accurate model for image detection
+       
         image_model_path = os.path.join(settings.BASE_DIR, 'YOLO11n.pt')
         
-        # ✅ MODEL 2: Fast model for video streaming
         video_model_path = os.path.join(settings.BASE_DIR, 'best.pt')
-        
-        # Check and load image model
+       
         if not os.path.exists(image_model_path):
             alt_paths = [
                 os.path.join(settings.BASE_DIR, 'YOLO-Weights', 'YOLO11n.pt'),
@@ -31,17 +29,17 @@ class YOLOPPEDetector:
             else:
                 raise FileNotFoundError(f"Image model not found in {settings.BASE_DIR}")
         
-        # ✅ Load accurate model for images
+        
         self.image_model = YOLO(image_model_path)
         self.model = self.image_model  # Default reference
         
-        # ✅ Load fast model for video (if available)
+    
         if os.path.exists(video_model_path):
             self.video_model = YOLO(video_model_path)
             print(f"[PPE DETECTOR] ✅ Loaded IMAGE model: {os.path.basename(image_model_path)}")
             print(f"[PPE DETECTOR] ✅ Loaded VIDEO model: {os.path.basename(video_model_path)}")
         else:
-            # Fallback: use same model for both
+           
             self.video_model = self.image_model
             print(f"[PPE DETECTOR] ⚠️ Using single model: {os.path.basename(image_model_path)}")
             print(f"[PPE DETECTOR] 💡 Tip: Add 'best.pt' for faster video streaming")
@@ -49,16 +47,15 @@ class YOLOPPEDetector:
         self.classNames = ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 
                           'Person', 'Safety Cone', 'Safety Vest', 'machinery', 'vehicle']
         
-        # ✅ GPU acceleration if available
         if torch.cuda.is_available():
             self.image_model.to('cuda')
             self.video_model.to('cuda')
-            print(f"[PPE DETECTOR] 🚀 Using GPU: {torch.cuda.get_device_name(0)}")
+            print(f"[PPE DETECTOR]  Using GPU: {torch.cuda.get_device_name(0)}")
         else:
-            print("[PPE DETECTOR] 💻 Using CPU")
+            print("[PPE DETECTOR]  Using CPU")
     
     def _load_image(self, image_path: str):
-        """Load image with support for multiple formats"""
+        
         try:
             pil_image = Image.open(image_path)
             
@@ -78,22 +75,12 @@ class YOLOPPEDetector:
                 raise ValueError(f"Could not read image: {image_path}")
             return img
     
-    # ✅ NEW: Fast detection for video frames
+    
     def detect_frame(self, frame, use_fast_model=True):
-        """
-        Process a single frame for real-time video
         
-        Args:
-            frame: numpy array (BGR image)
-            use_fast_model: If True, use faster video model
-        
-        Returns:
-            dict with persons, num_persons, and YOLO results
-        """
-        # Select model based on use case
         model = self.video_model if use_fast_model else self.image_model
         
-        # Fast inference with optimized settings
+      
         results = model(frame, verbose=False, conf=0.5, iou=0.5)[0]
         
         persons = []
@@ -114,11 +101,11 @@ class YOLOPPEDetector:
         return {
             'persons': persons,
             'num_persons': len(persons),
-            'results': results  # ✅ Return for plotting
+            'results': results  
         }
 
     def _extract_ppe_from_class(self, class_name, confidence):
-        """Extract PPE status from class name"""
+     
         ppe = {
             'helmet': {'detected': False, 'confidence': 0},
             'safety_vest': {'detected': False, 'confidence': 0},
@@ -135,7 +122,7 @@ class YOLOPPEDetector:
         
         return ppe
 
-    # ✅ EXISTING: Accurate detection for images
+
     def detect(self, image_path: str):
         """Detect PPE with accurate model (for image uploads)"""
         import time
@@ -150,7 +137,7 @@ class YOLOPPEDetector:
         height, width = img.shape[:2]
         print(f"Image: {width}x{height}px")
         
-        # ✅ Use ACCURATE image model
+      
         results = self.image_model(img, stream=True, conf=0.4, iou=0.5)
         
         all_detections = []
@@ -225,7 +212,7 @@ class YOLOPPEDetector:
             person_conf = person_det['confidence']
             person_height = py2 - py1
             
-            print(f"\n  👤 Person #{idx+1} at ({px1:.0f}, {py1:.0f}, {px2:.0f}, {py2:.0f})")
+            print(f"\n  Person #{idx+1} at ({px1:.0f}, {py1:.0f}, {px2:.0f}, {py2:.0f})")
             
             regions = {
                 'head': [px1 - 80, py1 - 100, px2 + 80, py1 + (person_height * 0.4)],
@@ -305,7 +292,7 @@ class YOLOPPEDetector:
                     'ppe_id': best_mask['ppe_id']
                 }
             
-            # Mark assigned PPE
+    
             for key in ['helmet', 'vest', 'mask']:
                 if ppe_tracking[key]['ppe_id']:
                     assigned_ppe.add(ppe_tracking[key]['ppe_id'])
@@ -314,7 +301,7 @@ class YOLOPPEDetector:
             has_vest = ppe_tracking['vest']['detected']
             has_mask = ppe_tracking['mask']['detected']
             
-            # Low confidence NO-Mask inference
+         
             if not has_mask and ppe_tracking['mask']['source'] == 'NO-Mask' and ppe_tracking['mask']['confidence'] < 0.7:
                 has_mask = True
             
