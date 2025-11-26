@@ -38,7 +38,26 @@ Using advanced Deep Learning models and Computer Vision, the system ensures that
 The system supports **live camera feeds, image uploads, live image capture, image analysis, and CCTV RTSP IP camera streams** for comprehensive workplace monitoring.
 
 ---
+---
 
+## 📸 
+
+### Home
+![Home](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141615.png)
+
+### Dashboard
+![Dashboard](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141652.png)
+
+### CCTV Monitor
+![CCTV Monitor](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141703.png)
+
+### Live Detection
+![Live Detection](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141809.png)
+
+### Detection History
+![Detection History](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141836.png)
+
+---
 ## ✨ Features
 
 ### Core Functionality
@@ -285,27 +304,6 @@ curl -X POST http://localhost:8000/api/ppe/detections/ \
   -H "Authorization: Token YOUR_TOKEN" \
   -F "original_image=@safety_site.jpg"
 ```
-
----
-
-## 📸 Screenshots
-
-### Home
-![Home](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141615.png)
-
-### Dashboard
-![Dashboard](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141652.png)
-
-### CCTV Monitor
-![CCTV Monitor](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141703.png)
-
-### Live Detection
-![Live Detection](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141809.png)
-
-### Detection History
-![Detection History](https://github.com/ranasaurabh191/SafetySnap/blob/main/screenshots/Screenshot%202025-10-29%20141836.png)
-
----
 
 ## 🌐 Deployment
 
